@@ -2,89 +2,82 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameController : MonoBehaviour {
+public class GameController : MonoBehaviour
+{
 
     public bool godModeActivated;
     public string playerMarbleType;
-    public List<Rigidbody> selectedMarbles;
+    public List<MarbleBehaviour> selectedMarbles;
 
-    public List<Formation> formations = new List<Formation>();
+    public List<MarbleBehaviour> marbles;
+    public List<Formation> formations;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
+        formations = new List<Formation>();
         List<Vector3> relativePositions = new List<Vector3>();
         relativePositions.Add(new Vector3(0, 0, 0));
         relativePositions.Add(new Vector3(2, 0, 0));
         relativePositions.Add(new Vector3(-2, 0, 0));
         Formation straightFormation = new Formation(relativePositions);
         formations.Add(straightFormation);
-	}
+    }
 	
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update()
+    {
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit, 100.0f))
             {
-                if (godModeActivated)
+                if (hit.collider.gameObject.tag.Contains("Marble"))
                 {
-                    if (hit.collider.gameObject.tag.Contains("Marble"))
-                    {
-                        selectedMarbles.Add(hit.collider.gameObject.GetComponent<Rigidbody>());
-                    }
-                    else if (hit.collider.gameObject.tag.Contains("Ground"))
-                    {
-                        foreach (Rigidbody selected in selectedMarbles)
-                        {
-                            selected.GetComponent<MarbleBehaviour>().moveTo(hit.point);
-                        }
-                        selectedMarbles.Clear();
-                    }
-                }
-                //Replace this with whatever logic you want to use to validate the objects you want to click on
-                else if (hit.collider.gameObject.tag == playerMarbleType)
-                {
-                    selectedMarbles.Add(hit.collider.gameObject.GetComponent<Rigidbody>());
-                }
 
-                if (hit.collider.gameObject.tag.Contains("Ground"))
-                {
-                    if (Input.GetKeyDown("F"))
+                    if (godModeActivated || hit.collider.gameObject.tag == playerMarbleType)
                     {
+                        selectedMarbles.Add(hit.collider.gameObject.GetComponent<MarbleBehaviour>());
+                    }
+                }
+                else if (hit.collider.gameObject.tag.Contains("Ground"))
+                {
+                    if (Input.GetKeyDown("f"))
+                    {
+                        //TODO work
                         Formation f = formations[0];
-                        if (selectedMarbles.Count < f.relativePositions.Count)
-                        {
-                            for (int index = 0; index < selectedMarbles.Count; index++)
-                            {
-                                selectedMarbles[index].GetComponent<MarbleBehaviour>().moveToWithFormation(hit.point, f.relativePositions[index], selectedMarbles);
-                            }
-                        }
+                        f.setMarbles(selectedMarbles);
+                        f.assignGoal(hit.point, false);
                     }
                     else
                     {
-                        foreach (Rigidbody selected in selectedMarbles)
+                        foreach (MarbleBehaviour selected in selectedMarbles)
                         {
-                            selected.GetComponent<MarbleBehaviour>().moveTo(hit.point);
+                            selected.assignGoal(hit.point);
                         }
                     }
+                    selectedMarbles.Clear();
                 }
             }
         }
     }
 
-}
-
-public class Formation
-{
-    public List<Vector3> relativePositions;
-    public Formation(List<Vector3> relativePositions)
+    // Update is called once per frame
+    void FixedUpdate()
     {
-        this.relativePositions = relativePositions;
-    }
-}
+        foreach (Formation formation in formations)
+        {
+            formation.move();
+        }
+        foreach (MarbleBehaviour marble in marbles)
+        {
+            marble.move();
+        }
 
+    }
+
+}
 //Testbehaviour (Push in static direciton)
 /*if (hit.collider.gameObject.tag.Contains("Marble"))
 {
