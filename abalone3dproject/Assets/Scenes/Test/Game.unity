@@ -3173,7 +3173,7 @@ Prefab:
     - target: {fileID: 114240637118433132, guid: 13d7c0a146cd0524581726e269efc6e8,
         type: 2}
       propertyPath: marbleStrength
-      value: 2
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 114240637118433132, guid: 13d7c0a146cd0524581726e269efc6e8,
         type: 2}
@@ -3188,6 +3188,11 @@ Prefab:
         type: 2}
       propertyPath: m_Mass
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 54796833719223388, guid: 13d7c0a146cd0524581726e269efc6e8,
+        type: 2}
+      propertyPath: m_AngularDrag
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 13d7c0a146cd0524581726e269efc6e8, type: 2}

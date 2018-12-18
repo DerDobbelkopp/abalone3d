@@ -8,6 +8,7 @@ public class GameController : MonoBehaviour
     public bool godModeActivated;
     public string playerMarbleType;
     public List<MarbleBehaviour> selectedMarbles;
+    private HashSet<MarbleBehaviour> unassignedMarbles;
 
     public List<MarbleBehaviour> marbles;
     public List<Formation> formations;
@@ -18,10 +19,11 @@ public class GameController : MonoBehaviour
         formations = new List<Formation>();
         List<Vector3> relativePositions = new List<Vector3>();
         relativePositions.Add(new Vector3(0, 0, 0));
-        relativePositions.Add(new Vector3(2, 0, 0));
+        relativePositions.Add(new Vector3(5, 0, 0));
         relativePositions.Add(new Vector3(-2, 0, 0));
         Formation straightFormation = new Formation(relativePositions);
         formations.Add(straightFormation);
+        unassignedMarbles = new HashSet<MarbleBehaviour>(marbles);
     }
 	
     // Update is called once per frame
@@ -47,6 +49,8 @@ public class GameController : MonoBehaviour
                     {
                         //TODO work
                         Formation f = formations[0];
+                        unassignedMarbles.UnionWith(f.marbles);
+                        unassignedMarbles.ExceptWith(selectedMarbles);
                         f.setMarbles(selectedMarbles);
                         f.assignGoal(hit.point, false);
                     }
@@ -70,7 +74,7 @@ public class GameController : MonoBehaviour
         {
             formation.move();
         }
-        foreach (MarbleBehaviour marble in marbles)
+        foreach (MarbleBehaviour marble in unassignedMarbles)
         {
             marble.move();
         }
