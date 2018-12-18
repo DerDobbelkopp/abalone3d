@@ -43,7 +43,7 @@ public class GameController : MonoBehaviour
                 }
                 else if (hit.collider.gameObject.tag.Contains("Ground"))
                 {
-                    if (Input.GetKeyDown("f"))
+                    if (Input.GetKey("f"))
                     {
                         //TODO work
                         Formation f = formations[0];

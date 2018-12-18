@@ -27,28 +27,25 @@ public class MarbleBehaviour : MonoBehaviour
     // Update is called once per frame
     public void move()
     {
-        Vector3 dist = targetPosition - transform.position;
-        dist.y = 0; // ignore height differences
+        Vector3 dir = targetPosition - transform.position;
+        dir.y = 0; // ignore height differences
         if (!keepRolling)
         {
-            // calc a target vel proportional to distance (clamped to maxVel)
-            Vector3 tgtVel = 1.5f * dist;// Vector3.ClampMagnitude(toVel * dist, maxVel);
-            // calculate the velocity error
-            Vector3 error = tgtVel - myRigidbody.velocity;
+            Vector3 tgtVel = dir.normalized * Mathf.Sqrt((dir + myRigidbody.velocity * Time.fixedDeltaTime).magnitude * marbleStrength / myRigidbody.mass);
             // calc a force proportional to the error (clamped to maxForce)
-            myRigidbody.GetComponent<ConstantForce>().force = Vector3.ClampMagnitude(5 * error, marbleStrength);
+            myRigidbody.GetComponent<ConstantForce>().force = Vector3.ClampMagnitude(20 * (tgtVel - myRigidbody.velocity) * myRigidbody.mass, marbleStrength);
         }
         else if (!reached)
         {
-            myRigidbody.GetComponent<ConstantForce>().force = dist.normalized * marbleStrength;
-            if (dist.magnitude < 0.1f)
+            myRigidbody.GetComponent<ConstantForce>().force = dir.normalized * marbleStrength;
+            if (dir.magnitude < 0.1f)
             {
                 reached = true;
             }
         }
         else
         {
-            myRigidbody.GetComponent<ConstantForce>().force = -dist.normalized * marbleStrength;
+            myRigidbody.GetComponent<ConstantForce>().force = -dir.normalized * marbleStrength;
         }
     }
 
