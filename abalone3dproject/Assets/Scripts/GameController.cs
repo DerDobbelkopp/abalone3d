@@ -7,7 +7,7 @@ public class GameController : MonoBehaviour
 
     public bool godModeActivated;
     public string playerMarbleType;
-    public List<MarbleBehaviour> selectedMarbles;
+    public HashSet<MarbleBehaviour> selectedMarbles;
     private HashSet<MarbleBehaviour> unassignedMarbles;
 
     public List<MarbleBehaviour> marbles;
@@ -18,11 +18,12 @@ public class GameController : MonoBehaviour
     {
         formations = new List<Formation>();
         List<Vector3> relativePositions = new List<Vector3>();
-        relativePositions.Add(new Vector3(0, 0, 0));
-        relativePositions.Add(new Vector3(5, 0, 0));
-        relativePositions.Add(new Vector3(-2, 0, 0));
+        relativePositions.Add(new Vector3(1, 0, 0));
+        relativePositions.Add(new Vector3(3, 0, 0));
+        relativePositions.Add(new Vector3(6, 0, 0));
         Formation straightFormation = new Formation(relativePositions);
         formations.Add(straightFormation);
+        selectedMarbles = new HashSet<MarbleBehaviour>();
         unassignedMarbles = new HashSet<MarbleBehaviour>(marbles);
     }
 	
@@ -49,8 +50,12 @@ public class GameController : MonoBehaviour
                     {
                         Formation f = formations[0];
                         unassignedMarbles.UnionWith(f.marbles);
-                        unassignedMarbles.ExceptWith(selectedMarbles);
+                        foreach (MarbleBehaviour marble in marbles)
+                        {
+                            marble.assignGoal(marble.myRigidbody.position);
+                        }
                         f.setMarbles(selectedMarbles);
+                        unassignedMarbles.ExceptWith(f.marbles);
                         f.assignGoal(hit.point, false);
                     }
                     else
