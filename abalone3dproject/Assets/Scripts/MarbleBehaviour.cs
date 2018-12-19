@@ -2,82 +2,58 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MarbleBehaviour : MonoBehaviour {
+public class MarbleBehaviour : MonoBehaviour
+{
 
-    public float marbleMaxVelocity; //Nutzer wird marbleMaxSpeed sehen
     public float marbleStrength;
 
-    public float factorRelCount; //Gewichtungsfaktor für die relative Position der Kugel in einer Formation
+    public Rigidbody myRigidbody;
 
-    private Rigidbody myRigidbody;
+    public bool keepRolling = false;
+    private bool reached = false;
 
-    private bool movingToLocationActive = false;
-    private Vector3 targetPosition;
-    private Vector3 relativePosition;
-    private List<Rigidbody> formationMembers;
+    public Vector3 targetPosition;
 
-    //Parameters for marble-moving behaviour
-    public float stopDistance;
+    public float marbleMaxVelocity;
+    public Formation f;
+
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         myRigidbody = this.gameObject.GetComponent<Rigidbody>();
+        marbleMaxVelocity = Mathf.Sqrt(marbleStrength / (myRigidbody.drag + myRigidbody.angularDrag));
     }
 	
-	// Update is called once per frame
-	void Update () {
-        if (movingToLocationActive)
+    // Update is called once per frame
+    public void move()
+    {
+        Vector3 dir = targetPosition - transform.position;
+        dir.y = 0; // ignore height differences
+        if (!keepRolling)
         {
-            Vector3 targetDirection = targetPosition - myRigidbody.position;
-            Vector3 relativeDirection = Vector3.zero;
-
-            if (!relativePosition.Equals(Vector3.zero)) {
-
-                Vector3 formationMemberCenterPoint = Vector3.zero;
-                foreach (Rigidbody member in formationMembers)
-                {
-                    formationMemberCenterPoint += member.position;
-                }
-                formationMemberCenterPoint /= formationMembers.Count;
-                relativeDirection = formationMemberCenterPoint - myRigidbody.position + relativePosition;
-            }
-
-            if (targetDirection.magnitude < stopDistance)
+            Vector3 tgtVel = dir.normalized * Mathf.Sqrt((dir + myRigidbody.velocity * Time.fixedDeltaTime).magnitude * marbleStrength / myRigidbody.mass);
+            // calc a force proportional to the error (clamped to maxForce)
+            myRigidbody.GetComponent<ConstantForce>().force = Vector3.ClampMagnitude(20 * (tgtVel - myRigidbody.velocity) * myRigidbody.mass, marbleStrength);
+        }
+        else if (!reached)
+        {
+            myRigidbody.GetComponent<ConstantForce>().force = dir.normalized * marbleStrength;
+            if (dir.magnitude < 0.1f)
             {
-                myRigidbody.GetComponent<ConstantForce>().force = Vector3.zero;
-                movingToLocationActive = false;
-            }
-            else
-            {
-                Vector3 targetDirectionNormalized = targetDirection.normalized;
-                Vector3 relativeDirectionNormalized = relativeDirection.normalized;
-
-                Vector3 appliedForce = marbleStrength * ((1-factorRelCount) * targetDirectionNormalized + factorRelCount * relativeDirectionNormalized);
-
-                if (appliedForce.magnitude > marbleMaxVelocity) appliedForce = appliedForce.normalized*marbleMaxVelocity;
-
-                myRigidbody.GetComponent<ConstantForce>().force = appliedForce;
+                reached = true;
             }
         }
-	}
-
-    public List<Rigidbody> getFormationMembers()
-    {
-        return formationMembers;
+        else
+        {
+            myRigidbody.GetComponent<ConstantForce>().force = -dir.normalized * marbleStrength;
+        }
     }
 
-    public void moveTo(Vector3 targetPosition)
+    public void assignGoal(Vector3 targetPosition)
     {
-        movingToLocationActive = true;
         this.targetPosition = targetPosition;
-        this.relativePosition = Vector3.zero;
-    }
-
-    public void moveToWithFormation(Vector3 targetPosition, Vector3 relativePosition, List<Rigidbody> formationMembers)
-    {
-        movingToLocationActive = true;
-        this.targetPosition = targetPosition;
-        this.relativePosition = relativePosition;
+        this.reached = false;
     }
 
     public void setSelected(bool selected)
