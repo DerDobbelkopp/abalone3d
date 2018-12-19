@@ -36,6 +36,7 @@ public class Formation
             {
                 maxAccelleration = marble.marbleStrength / marble.myRigidbody.mass;
             }
+            marble.f = this;
         }
     }
 
