@@ -47,7 +47,6 @@ public class GameController : MonoBehaviour
                 {
                     if (Input.GetKey("f"))
                     {
-                        //TODO work
                         Formation f = formations[0];
                         unassignedMarbles.UnionWith(f.marbles);
                         unassignedMarbles.ExceptWith(selectedMarbles);
@@ -59,6 +58,12 @@ public class GameController : MonoBehaviour
                         foreach (MarbleBehaviour selected in selectedMarbles)
                         {
                             selected.assignGoal(hit.point);
+                            if (selected.f != null)
+                            {
+                                selected.f.marbles.Remove(selected);
+                                unassignedMarbles.Add(selected);
+                            }
+
                         }
                     }
                     selectedMarbles.Clear();

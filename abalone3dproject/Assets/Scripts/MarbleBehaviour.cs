@@ -15,6 +15,7 @@ public class MarbleBehaviour : MonoBehaviour
     public Vector3 targetPosition;
 
     public float marbleMaxVelocity;
+    public Formation f;
 
 
     // Use this for initialization
