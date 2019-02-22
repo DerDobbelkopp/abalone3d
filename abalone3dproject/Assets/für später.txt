@@ -1,0 +1,13 @@
+Für später (Least Squares für Formationen):
+
+
+
+Nutzen von Eigen in Unity:
+http://longqian.me/2017/02/24/eigen-in-unity/
+
+Eigen Download:
+http://eigen.tuxfamily.org/index.php?title=Main_Page
+
+solve Befehl aus
+https://eigen.tuxfamily.org/dox/classEigen_1_1CompleteOrthogonalDecomposition.html#ab303e177cc7df17e435c79dca9ef5654
+für LeastSquares Lösung
